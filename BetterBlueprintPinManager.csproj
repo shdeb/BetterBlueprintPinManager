@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <AssemblyName>BetterBlueprintPinManager</AssemblyName>
+        <Version>1.0.0</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>11</LangVersion>
+        <RootNamespace>BetterBlueprintPinManager</RootNamespace>
+
+        <RestoreAdditionalProjectSources>
+            https://nuget.bepinex.dev/v3/index.json;
+            https://api.nuget.org/v3/index.json;
+        </RestoreAdditionalProjectSources>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+	
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
+		<Compile Remove="UnitTests.cs" />
+		<Compile Remove="BetterPinManager.cs" />
+		<Compile Remove="XCraftDagService.cs" />
+	</ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Items\**" />
+        <EmbeddedResource Remove="Items\**" />
+        <None Remove="Items\**" />
+    </ItemGroup>
+
+
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
+        <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
+        <PackageReference Include="Unity.InputSystem" Version="1.4.1" IncludeAssets="compile" />
+        <PackageReference Include="Subnautica.GameLibs" Version="82304.0.0-r.0" />
+        <PackageReference Include="PolySharp" Version="1.15.0" />
+        <PackageReference Include="Subnautica.Nautilus" Version="1.*-*" PrivateAssets="all" />
+        <PackageReference Include="System.Memory" Version="4.5.5" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+        <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="BetterBlueprintPinManager.Test" />
+	</ItemGroup>
+
+</Project>
