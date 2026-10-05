@@ -18,10 +18,10 @@ This mod wants to solve that problem, plus adds few quality of life features.
 * A new UI element, which, shows total raw ingredients needed across all the pinned blueprints.
 
 ## Installation
-Download the zip file, extract/copy the folder 
-and put it into the ...\Subnautica\BepInEx\plugins directory.
-It should look like:
-...\Subnautica\BepInEx\plugins\BetterBlueprintPinManager\BetterBlueprintPinManager.dll
+* Download the zip file, extract/copy the folder 
+* and put it into the `...\Subnautica\BepInEx\plugins` directory.
+* It should look like:<br/>
+`...\Subnautica\BepInEx\plugins\BetterBlueprintPinManager\BetterBlueprintPinManager.dll`
 
 ## Requirements
 * Subnautica BepInEx Pack
