@@ -16,6 +16,7 @@ This mod wants to solve that problem, plus adds few quality of life features.
 * Option to auto hide / peek the ingredients with a keybind.
 * Option to show only raw ingredients.
 * A new UI element, which, shows total raw ingredients needed across all the pinned blueprints.
+* Options to resize icons, increase no. of pinned items by varying vertical spacing and horizontal ingredient item spacing. (⭐ v1.1.0) 
 
 ## Installation
 Download the zip file, extract/copy the folder 
