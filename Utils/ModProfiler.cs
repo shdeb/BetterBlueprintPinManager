@@ -1,11 +1,11 @@
 ﻿using BepInEx.Logging;
 using System.Diagnostics;
 
-namespace BetterBlueprintPinManager
+namespace BetterBlueprintPinManager.Utils
 {
     public static class ModProfiler
     {
-//#if DEBUG
+        //#if DEBUG
         private static ManualLogSource _logger;
 
         //static ModProfiler()
@@ -31,14 +31,14 @@ namespace BetterBlueprintPinManager
         /// </summary>
         public static void LogAndStop(this Stopwatch timer, string targetName, double thresholdMs = 0.0)
         {
-            Log(timer, targetName, thresholdMs, true);
+            timer.Log(targetName, thresholdMs, true);
         }
         /// <summary>
         /// logs execution metrics, timer restarts.
         /// </summary>
         public static void LogAndRestart(this Stopwatch timer, string targetName, double thresholdMs = 0.0)
         {
-            Log(timer, targetName, thresholdMs, false);
+            timer.Log(targetName, thresholdMs, false);
             timer.Restart();
         }
         /// <summary>
@@ -62,20 +62,20 @@ namespace BetterBlueprintPinManager
 
             }
         }
-//#else
-//        [Conditional("DEBUG")]
-//        public static void Init(ManualLogSource logger) { }
-//        public static bool Start()
-//        {
-//            return false;
-//        }
-//        [Conditional("DEBUG")]
-//        public static void LogAndStop(this bool _, string targetName, double thresholdMs = 0.0) { }
-//        [Conditional("DEBUG")]
-//        public static void LogAndRestart(this bool _, string targetName, double thresholdMs = 0.0) { }
-//        [Conditional("DEBUG")]
-//        public static void Log(this bool _, string targetName, double thresholdMs = 0.0, bool shouldStop = false) { }
+        //#else
+        //        [Conditional("DEBUG")]
+        //        public static void Init(ManualLogSource logger) { }
+        //        public static bool Start()
+        //        {
+        //            return false;
+        //        }
+        //        [Conditional("DEBUG")]
+        //        public static void LogAndStop(this bool _, string targetName, double thresholdMs = 0.0) { }
+        //        [Conditional("DEBUG")]
+        //        public static void LogAndRestart(this bool _, string targetName, double thresholdMs = 0.0) { }
+        //        [Conditional("DEBUG")]
+        //        public static void Log(this bool _, string targetName, double thresholdMs = 0.0, bool shouldStop = false) { }
 
-//#endif
+        //#endif
     }
 }

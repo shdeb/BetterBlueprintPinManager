@@ -1,25 +1,22 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using BetterBlueprintPinManager.Utils;
 //using BetterBlueprintPinManager.Items.Equipment;
 using HarmonyLib;
-using Microsoft.Cci;
 using Nautilus.Crafting;
 using Nautilus.Handlers;
 using Nautilus.Json.Converters;
 using Nautilus.Utility;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using static HandReticle;
-using static VFXParticlesPool;
+using UnityEngine.UI;
 
 
 namespace BetterBlueprintPinManager
@@ -198,11 +195,40 @@ namespace BetterBlueprintPinManager
 
         internal static void OnPinAdd(TechType type, uGUI_RecipeEntry recipeEntry)
         {
+            recipeEntry.icon.SetForegroundSize(new Vector2(modConfig.iconSize, modConfig.iconSize));
+            recipeEntry.icon.SetBackgroundSize(new Vector2(modConfig.iconSize, modConfig.iconSize));
+            recipeEntry.icon.SetBackgroundAlpha(modConfig.bgOpacity);
+
+            //if(recipeEntry.background.TryGetComponent<HorizontalLayoutGroup>(out var hlg1))
+            //{
+            //    Logger.LogDebug($"hlg found in background GameObject name:{hlg1.gameObject.name}");
+            //    hlg1.spacing = modConfig.itemIconSpacing;
+            //}
+            //else 
+            if (recipeEntry.canvas.TryGetComponent<HorizontalLayoutGroup>(out var hlg2))
+            {
+                Logger.LogDebug($"hlg found in canvas RectTransform name:{hlg2.gameObject.name}");
+                hlg2.spacing = modConfig.itemIconSpacing;
+            }
+            //else
+            //{
+            //    var hlg3 = recipeEntry.gameObject.GetComponentInChildren<HorizontalLayoutGroup>();
+            //    if(hlg3 != null)
+            //    {
+            //        Logger.LogDebug($"hlg found in gameObject name:{hlg3.gameObject.name}");
+            //        hlg3.spacing = modConfig.itemIconSpacing;
+            //    }
+            //    else
+            //        Logger.LogWarning($"hlg not found");
+            //}
+
+
             var h = recipeEntry.gameObject.AddComponent<MyScrollHandler>();
             h.onScroll += updateWantsOnScroll;
             if (!pinned_wants.ContainsKey(type))
                 pinned_wants[type] = new _wantDetails { recipeEntry = recipeEntry, count = 1 };
             recipeEntry.UpdateIngredients(recipeEntry.manager.GetContainer(), true);
+
         }
 
         internal static void OnPinRemove(TechType type)
@@ -326,19 +352,36 @@ namespace BetterBlueprintPinManager
     [HarmonyPatch]
     class MyPatches
     {
-        internal static uGUI_PinnedRecipes PinnedRecipes_instance;
         static Color orange = new Color(1f, 0.35f, 0f);
-        internal static uGUI_RecipeEntry cloneEntry;
+        internal static readonly int modeCount = Enum.GetNames(typeof(uGUI_PinnedRecipes.Mode)).Length;
+        internal static uGUI_PinnedRecipes PinnedRecipes_instance = null;
+        internal static uGUI_RecipeEntry cloneEntry = null;
         static bool canShowTotalsUI = false;
         private static bool updatingIngredients = false;
-        internal static readonly int modeCount = Enum.GetNames(typeof(uGUI_PinnedRecipes.Mode)).Length;
+
+        internal static void Initialize_UI_TotalRaw()
+        {
+            Plugin.Logger.LogInfo("Initialize_UI_TotalRaw : init raw totals UI entry prefab clone");
+            if (cloneEntry != null) {
+                clear_UI_TotalRaw();
+                UnityEngine.Object.Destroy(cloneEntry.gameObject); 
+            }
+            cloneEntry = UnityEngine.Object
+                            .Instantiate(PinnedRecipes_instance.prefabEntry, PinnedRecipes_instance.canvas)
+                            .GetComponent<uGUI_RecipeEntry>();
+            cloneEntry.Initialize(TechType.Fabricator);
+            cloneEntry.rectTransform.anchoredPosition = new Vector2(-10f, 100f);
+            cloneEntry.text.text = string.Empty;
+            //cloneEntry.Deinitialize();  //i.e base.gameObject.SetActive(false);
+            clear_UI_TotalRaw();
+        }
 
         // System.Void uGUI_PinnedRecipes::Initialize()
         [HarmonyPostfix]
         [HarmonyPatch(typeof(uGUI_PinnedRecipes), nameof(uGUI_PinnedRecipes.Initialize))]
         static void PinnedRecipes_Initialize_postfix(uGUI_PinnedRecipes __instance)
         {
-            if(PinnedRecipes_instance != null && !ReferenceEquals(__instance, PinnedRecipes_instance)) 
+            if (PinnedRecipes_instance != null && !ReferenceEquals(__instance, PinnedRecipes_instance))
                 Plugin.Logger.LogInfo("U_PR init POFX : WARN : PinnedRecipes_instance NOT CONSISTENT");
 
             if (!__instance.initialized) return;
@@ -356,15 +399,9 @@ namespace BetterBlueprintPinManager
             Plugin.tInvBuf.Clear();
             Plugin.pinned_wants.Clear();
 
-            Plugin.Logger.LogInfo("U_PR init POFX : init raw totals UI entry prefab clone");
-            cloneEntry = UnityEngine.Object
-                .Instantiate(PinnedRecipes_instance.prefabEntry, PinnedRecipes_instance.canvas)
-                .GetComponent<uGUI_RecipeEntry>();
-            cloneEntry.Initialize(TechType.Fabricator);
-            cloneEntry.rectTransform.anchoredPosition = new Vector2(-100f, 100f);
-            cloneEntry.text.text = string.Empty;
-            //cloneEntry.Deinitialize();  //i.e base.gameObject.SetActive(false);
-            clear_UI_TotalRaw();
+            Plugin.modConfig.iconSizeChange();
+            // above already has Initialize_UI_TotalRaw
+            Initialize_UI_TotalRaw();
 
             //PinManager.onAdd += Plugin.OnPinAdd;
             //PinManager.onRemove += Plugin.OnPinRemove;
